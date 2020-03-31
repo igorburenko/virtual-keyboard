@@ -1,0 +1,86 @@
+body{
+    font-family: arial, sans-serif;
+}
+
+.wrapper {
+    max-width: 900px;
+    width: 90vw;
+    margin: 10px auto 0;
+}
+
+.input-window {
+    height: 250px;
+}
+
+textarea {
+    height: calc(100% - 12px);
+    width: calc(100% - 34px);
+    resize: none;
+    padding: 15px;
+    border: 2px solid cornflowerblue;
+}
+
+.keyboard {
+    height: 300px;
+    width: 100%;
+    background-color: cornflowerblue;
+    /*padding: 5px; */
+}
+
+.keyboard__keys {
+    padding-top: 30px;
+    text-align: center;
+}
+
+.key {
+    height: 45px;
+    width: 5%;
+    max-width: 90px;
+    margin: 3px;
+    border-radius: 3px;
+    border: none;
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    font-size: 1rem;
+    outline: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: top;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    transition: all .2s;
+}
+
+.key:active,
+.key_pressed {
+    background: rgba(207, 87, 80, 0.55);
+    border-radius: 50px;
+}
+
+.key_wide {
+    width: 12%;
+}
+
+.key_middle-wide {
+    width: 10%;
+}
+
+.key_shift-wide {
+    width: 15%;
+    max-width: 15%;
+}
+
+.key_ctrl {
+    width: 6%;
+}
+
+.key_space {
+    width: 36%;
+    max-width: 500px;
+}
+
+.key_hold {
+    background: rgb(167, 210, 168);
+}
