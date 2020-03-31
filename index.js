@@ -9,21 +9,24 @@ class VirtualKeyboard {
     };
 
     this.keyLayout = {
-      eng: {
-        Backquote: '`', Digit1: '1', Digit2: '2', Digit3: '3',
-      }
-      // eng: ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
-      //   'Tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\',
-      //   'CapsLock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', 'Enter',
-      //   'Shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',
-      //   'ctrl', 'alt', 'ru', 'Space', //'alt', 'ctrl',
-      // ],
-      // ru: ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
-      //   'Tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', 'ё',
-      //   'CapsLock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'Enter',
-      //   'Shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '/',
-      //   'ctrl', 'alt', 'eng', 'Space',// 'alt', 'ctrl',
-      // ],
+      eng: ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
+        'Tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\',
+        'CapsLock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', 'Enter',
+        'Shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',
+        'ctrl', 'alt', 'ru', 'Space', //'alt', 'ctrl',
+      ],
+      ru: ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
+        'Tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', 'ё',
+        'CapsLock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'Enter',
+        'Shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '/',
+        'ctrl', 'alt', 'eng', 'Space',// 'alt', 'ctrl',
+      ],
+      eventCode: ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace',
+        'Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', 'Backslash',
+        'CapsLock', 'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon', 'Quote', 'Enter',
+        'ShiftLeft', 'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash',
+        'ControlLeft', 'AltLeft', 'lang', 'Space',
+      ],
     };
   }
 
@@ -76,12 +79,12 @@ class VirtualKeyboard {
 
   makeKeys(language = 'eng') {
     this.fragment = document.createDocumentFragment();
-    this.keyLayout[language].forEach((value) => {
+    this.keyLayout[language].forEach((value, index) => {
       const keyElement = document.createElement('button');
       const addBrTag = ['Backspace', '\\', 'Enter', '/', 'ё'].indexOf(value) !== -1;
       keyElement.setAttribute('type', 'button');
       keyElement.classList.add('key');
-      keyElement.id = value;
+      keyElement.id = this.keyLayout.eventCode[index];
 
       switch (value) {
         case 'Backspace':
@@ -192,12 +195,12 @@ class VirtualKeyboard {
   }
 
   hardwareKeyboardKeyDown(event) {
-    if (event.key !== 'CapsLock') {
-      this.pressedKey = document.querySelector(`#${event.key}`);
+    if (event.code !== 'CapsLock') {
+      this.pressedKey = document.querySelector(`#${event.code}`);
       this.pressedKey.classList.add('key_pressed');
     }
 
-    switch (event.key) {
+    switch (event.code) {
       case 'Backspace':
         this.props.textValue = this.props.textValue
           .substring(0, this.props.textValue.length - 1);
@@ -215,7 +218,7 @@ class VirtualKeyboard {
         this.makeCharUp();
         break;
 
-      case 'Shift':
+      case 'ShiftLeft':
         this.props.capsLock = true;
         this.makeCharUp();
         break;
@@ -253,22 +256,22 @@ class VirtualKeyboard {
 
 
   hardwareKeyboardKeyUp(event) {
-    switch (event.key) {
+    switch (event.code) {
       case 'CapsLock':
         this.toggleCapsLock();
         break;
-      case 'Shift':
+      case 'ShiftLeft':
         this.capsLockKey = document.querySelector('.caps').classList.contains('key_hold');
         if (!this.capsLockKey) {
           this.props.capsLock = false;
         }
         this.makeCharUp();
-        this.unpressedKey = document.querySelector(`#${event.key}`);
+        this.unpressedKey = document.querySelector(`#${event.code}`);
         this.unpressedKey.classList.remove('key_pressed');
         break;
       default:
-        console.log(event);
-        this.unpressedKey = document.querySelector(`#${event.key}`);
+        // console.log(event);
+        this.unpressedKey = document.querySelector(`#${event.code}`);
         this.unpressedKey.classList.remove('key_pressed');
         break;
     }
