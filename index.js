@@ -7,6 +7,8 @@ class VirtualKeyboard {
     this.props = {
       textValue: '',
       capsLock: false,
+      controlPress: false,
+      altPress: false,
     };
 
     this.keyLayout = {
@@ -67,11 +69,19 @@ class VirtualKeyboard {
 
   toggleCapsLock() {
     this.props.capsLock = !this.props.capsLock;
-    this.makeCharUp();
-    document.querySelector('.caps').classList.toggle('key_hold');
+    this.showCapsLockActive();
+    this.toggleCharUpDown();
   }
 
-  makeCharUp() {
+  showCapsLockActive() {
+    if (this.props.capsLock) {
+      document.querySelector('.caps').classList.add('key_hold');
+    } else {
+      document.querySelector('.caps').classList.remove('key_hold');
+    }
+  }
+
+  toggleCharUpDown() {
     this.elements.keys = document.querySelectorAll('.caps-key');
     this.elements.keys.forEach((val, index) => {
       if (val.textContent.length === 1) {
@@ -156,6 +166,12 @@ class VirtualKeyboard {
     this.renderNewKeyboard();
   }
 
+  checkLangChangeFromHardware() {
+    if (this.props.controlPress && this.props.altPress) {
+      this.changeLanguage();
+    }
+  }
+
   toggleHardwareKeys() {
     document.addEventListener('keydown', (event) => {
       this.keyboardKeyDown(event);
@@ -168,10 +184,10 @@ class VirtualKeyboard {
   toggleVirtualKeys() {
     this.virtualKeyboardLayout = document.querySelector('.keyboard__keys');
     this.virtualKeyboardLayout.addEventListener('mousedown', (event) => {
-      this.keyboardKeyDown({ code: event.target.id, key: event.target.innerText });
+      this.keyboardKeyDown({ code: event.target.id, key: event.target.innerText, virtual: true });
     });
     this.virtualKeyboardLayout.addEventListener('mouseup', (event) => {
-      this.keyboardKeyUp({ code: event.target.id, key: event.target.innerText });
+      this.keyboardKeyUp({ code: event.target.id, key: event.target.innerText, virtual: true });
     });
   }
 
@@ -191,17 +207,19 @@ class VirtualKeyboard {
       case 'CapsLock':
         if (!this.props.capsLock) {
           this.toggleCapsLock();
+        } else if (event.virtual && this.props.capsLock) {
+          this.toggleCapsLock();
         }
         break;
 
       case 'Enter':
         this.props.textValue += '\n';
-        this.makeCharUp();
+        this.toggleCharUpDown();
         break;
 
       case 'ShiftLeft':
         this.props.capsLock = true;
-        this.makeCharUp();
+        this.toggleCharUpDown();
         break;
 
       case 'Tab':
@@ -213,14 +231,17 @@ class VirtualKeyboard {
         this.props.textValue += ' ';
         this.printToWindow();
         break;
-      //
-      // case 'ctrl':
-      // case 'alt':
-      //   keyElement.classList.add('key_ctrl');
-      //   keyElement.addEventListener('click', () => {
-      //   });
-      //   break;
-      //
+
+      case 'ControlLeft':
+        this.props.controlPress = true;
+        this.checkLangChangeFromHardware();
+        break;
+
+      case 'AltLeft':
+        this.props.altPress = true;
+        this.checkLangChangeFromHardware();
+        break;
+
       case 'lang':
         this.changeLanguage();
         break;
@@ -233,10 +254,14 @@ class VirtualKeyboard {
   }
 
   keyboardKeyUp(event) {
+    if (event.code !== 'CapsLock') {
+      this.unpressedKey = document.querySelector(`#${event.code}`);
+      this.unpressedKey.classList.remove('key_pressed');
+    }
     switch (event.code) {
       case 'CapsLock':
         this.shiftkKey = document.querySelector('#ShiftLeft').classList.contains('key_pressed');
-        if (this.props.capsLock && !this.shiftkKey) {
+        if (this.props.capsLock && !this.shiftkKey && event.type === 'keyup') {
           this.toggleCapsLock();
         }
         break;
@@ -246,14 +271,18 @@ class VirtualKeyboard {
         if (!this.capsLockKey) {
           this.props.capsLock = false;
         }
-        this.makeCharUp();
-        this.unpressedKey = document.querySelector(`#${event.code}`);
-        this.unpressedKey.classList.remove('key_pressed');
+        this.toggleCharUpDown();
+        break;
+
+      case 'ControlLeft':
+        this.props.controlPress = false;
+        break;
+
+      case 'AltLeft':
+        this.props.altPress = false;
         break;
 
       default:
-        this.unpressedKey = document.querySelector(`#${event.code}`);
-        this.unpressedKey.classList.remove('key_pressed');
         break;
     }
   }
