@@ -2,10 +2,11 @@ class VirtualKeyboard {
   constructor() {
     this.elements = {};
 
+    this.virtualKeyboardLayout = '';
+
     this.props = {
       textValue: '',
       capsLock: false,
-      lang: 'eng',
     };
 
     this.keyLayout = {
@@ -13,13 +14,13 @@ class VirtualKeyboard {
         'Tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\',
         'CapsLock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', 'Enter',
         'Shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',
-        'ctrl', 'alt', 'ru', 'Space', //'alt', 'ctrl',
+        'ctrl', 'alt', 'ru', 'Space',
       ],
       ru: ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
         'Tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', 'ё',
         'CapsLock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'Enter',
         'Shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '/',
-        'ctrl', 'alt', 'eng', 'Space',// 'alt', 'ctrl',
+        'ctrl', 'alt', 'eng', 'Space',
       ],
       eventCode: ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace',
         'Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', 'Backslash',
@@ -45,7 +46,8 @@ class VirtualKeyboard {
 
     this.elements.keysWrapper = document.createElement('div');
     this.elements.keysWrapper.classList.add('keyboard__keys');
-    this.elements.keysWrapper.appendChild(this.makeKeys());
+    this.lang = window.localStorage.lang || 'eng';
+    this.elements.keysWrapper.appendChild(this.makeKeys(this.lang));
 
     this.elements.keyboard = document.createElement('div');
     this.elements.keyboard.classList.add('keyboard');
@@ -55,6 +57,8 @@ class VirtualKeyboard {
     this.elements.wrapper.append(this.elements.keyboard);
 
     document.body.append(this.elements.wrapper);
+
+    this.virtualKeyboardLayout = document.querySelector('.keyboard__keys');
   }
 
   printToWindow() {
@@ -89,73 +93,39 @@ class VirtualKeyboard {
       switch (value) {
         case 'Backspace':
           keyElement.classList.add('key_wide');
-          keyElement.addEventListener('click', () => {
-            this.props.textValue = this.props.textValue
-              .substring(0, this.props.textValue.length - 1);
-            this.printToWindow();
-          });
           break;
 
         case 'CapsLock':
           keyElement.classList.add('key_wide', 'caps');
-          if (this.props.capsLock) {
-            keyElement.classList.add('key_hold');
-          }
-          keyElement.addEventListener('click', () => {
-            this.toggleCapsLock();
-          });
           break;
 
         case 'Enter':
           keyElement.classList.add('key_wide');
-          keyElement.addEventListener('click', () => {
-            this.props.textValue += '\n';
-          });
           break;
 
         case 'Shift':
           keyElement.classList.add('key_shift-wide');
-          keyElement.addEventListener('click', () => {
-            console.log(`clicked to ${value}`);
-          });
           break;
         case 'Tab':
           keyElement.classList.add('key_middle-wide');
-          keyElement.addEventListener('click', () => {
-            this.props.textValue += '   ';
-            this.printToWindow();
-          });
           break;
 
         case 'Space':
           keyElement.classList.add('key_space');
-          keyElement.addEventListener('click', () => {
-            this.props.textValue += ' ';
-            this.printToWindow();
-          });
           break;
 
         case 'ctrl':
         case 'alt':
           keyElement.classList.add('key_ctrl');
-          keyElement.addEventListener('click', () => {
-          });
           break;
 
         case 'ru':
         case 'eng':
           keyElement.classList.add('key_lang');
-          keyElement.addEventListener('click', () => {
-            this.changeLanguage();
-          });
           break;
 
         default:
           keyElement.classList.add('caps-key');
-          keyElement.addEventListener('click', () => {
-            this.props.textValue += this.props.capsLock ? value.toUpperCase() : value;
-            this.printToWindow();
-          });
           break;
       }
       keyElement.textContent = this.props.capsLock && keyElement.classList.contains('caps-key')
@@ -168,33 +138,44 @@ class VirtualKeyboard {
     return this.fragment;
   }
 
-  renderNewLangKeyboard() {
+  renderNewKeyboard() {
     this.elements.newKeysWrapper = document.createElement('div');
     this.elements.newKeysWrapper.classList.add('keyboard__keys');
-    this.elements.newKeysWrapper.appendChild(this.makeKeys(this.props.lang));
+    this.elements.newKeysWrapper.appendChild(this.makeKeys(window.localStorage.lang));
     this.elements.oldKeyboard = document.querySelector('.keyboard__keys');
     this.elements.oldKeyboard.replaceWith(this.elements.newKeysWrapper);
+    this.toggleVirtualKeys();
   }
 
   changeLanguage() {
-    if (this.props.lang === 'eng') {
-      this.props.lang = 'ru';
+    if (window.localStorage.lang === 'eng') {
+      window.localStorage.lang = 'ru';
     } else {
-      this.props.lang = 'eng';
+      window.localStorage.lang = 'eng';
     }
-    this.renderNewLangKeyboard();
+    this.renderNewKeyboard();
   }
 
   toggleHardwareKeys() {
     document.addEventListener('keydown', (event) => {
-      this.hardwareKeyboardKeyDown(event);
+      this.keyboardKeyDown(event);
     });
     document.addEventListener('keyup', (event) => {
-      this.hardwareKeyboardKeyUp(event);
+      this.keyboardKeyUp(event);
     });
   }
 
-  hardwareKeyboardKeyDown(event) {
+  toggleVirtualKeys() {
+    this.virtualKeyboardLayout = document.querySelector('.keyboard__keys');
+    this.virtualKeyboardLayout.addEventListener('mousedown', (event) => {
+      this.keyboardKeyDown({ code: event.target.id, key: event.target.innerText });
+    });
+    this.virtualKeyboardLayout.addEventListener('mouseup', (event) => {
+      this.keyboardKeyUp({ code: event.target.id, key: event.target.innerText });
+    });
+  }
+
+  keyboardKeyDown(event) {
     if (event.code !== 'CapsLock') {
       this.pressedKey = document.querySelector(`#${event.code}`);
       this.pressedKey.classList.add('key_pressed');
@@ -240,13 +221,10 @@ class VirtualKeyboard {
       //   });
       //   break;
       //
-      // case 'ru':
-      // case 'eng':
-      //   keyElement.classList.add('key_lang');
-      //   keyElement.addEventListener('click', () => {
-      //     this.changeLanguage();
-      //   });
-      //   break;
+      case 'lang':
+        this.changeLanguage();
+        break;
+
       default:
         this.props.textValue += this.props.capsLock ? event.key.toUpperCase() : event.key;
         this.printToWindow();
@@ -254,12 +232,15 @@ class VirtualKeyboard {
     }
   }
 
-
-  hardwareKeyboardKeyUp(event) {
+  keyboardKeyUp(event) {
     switch (event.code) {
       case 'CapsLock':
-        this.toggleCapsLock();
+        this.shiftkKey = document.querySelector('#ShiftLeft').classList.contains('key_pressed');
+        if (this.props.capsLock && !this.shiftkKey) {
+          this.toggleCapsLock();
+        }
         break;
+
       case 'ShiftLeft':
         this.capsLockKey = document.querySelector('.caps').classList.contains('key_hold');
         if (!this.capsLockKey) {
@@ -269,8 +250,8 @@ class VirtualKeyboard {
         this.unpressedKey = document.querySelector(`#${event.code}`);
         this.unpressedKey.classList.remove('key_pressed');
         break;
+
       default:
-        // console.log(event);
         this.unpressedKey = document.querySelector(`#${event.code}`);
         this.unpressedKey.classList.remove('key_pressed');
         break;
@@ -278,9 +259,9 @@ class VirtualKeyboard {
   }
 }
 
-
 window.onload = function () {
   const keyboard = new VirtualKeyboard();
   keyboard.init();
   keyboard.toggleHardwareKeys();
+  keyboard.toggleVirtualKeys();
 };
