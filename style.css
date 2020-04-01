@@ -18,11 +18,13 @@ textarea {
     resize: none;
     padding: 15px;
     border: 2px solid cornflowerblue;
+    min-width: 734px;
 }
 
 .keyboard {
     height: 300px;
     width: 100%;
+    min-width: 768px;
     background-color: cornflowerblue;
 }
 
@@ -76,7 +78,7 @@ textarea {
 }
 
 .key_space {
-    width: 36%;
+    width: 40%;
     max-width: 500px;
 }
 
