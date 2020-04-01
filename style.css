@@ -52,12 +52,15 @@ textarea {
     -webkit-tap-highlight-color: transparent;
     position: relative;
     transition: all .2s;
+    /*box-shadow: 1px 2px 5px 0 black;*/
 }
 
 .key:active,
 .key_pressed {
-    background: rgba(207, 87, 80, 0.55);
-    border-radius: 50px;
+    /*background: rgba(207, 87, 80, 0.55);*/
+    border-radius: 10px;
+    box-shadow: inset 0 1px 5px 0 black;
+    transition: all .2s;
 }
 
 .key_wide {
@@ -71,6 +74,7 @@ textarea {
 .key_shift-wide {
     width: 15%;
     max-width: 15%;
+    transition: all .2s;
 }
 
 .key_ctrl {
@@ -80,8 +84,35 @@ textarea {
 .key_space {
     width: 40%;
     max-width: 500px;
+    transition: all .2s;
 }
 
 .key_hold {
     background: rgb(167, 210, 168);
+    box-shadow: inset 0 1px 5px 0 black;
+}
+
+.help {
+    padding: 25px 10px;
+    min-width: 744px;
+    border: 2px solid cornflowerblue;
+    background: #6495ed80;
+    color: #375282;
+    text-align: justify;
+    line-height: 19px;
+    display: flex;
+    flex-wrap: wrap;
+
+}
+
+p {
+    margin: 0 0 10px;
+}
+
+.button-hide {
+    width: auto;
+    max-width: none;
+    color: #3b598e;
+    margin: 0 auto;
+
 }

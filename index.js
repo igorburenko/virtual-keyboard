@@ -74,8 +74,16 @@ class VirtualKeyboard {
 
     this.elements.help = document.createElement('div');
     this.elements.help.classList.add('help');
-    this.elements.help.textContent = ('Для переключения между раскладками используйте (win) => ctrl+alt, (mac) => '
-      + 'ctrl+option. Клавиатура создавалась в MAC OS, могут быть различия в нажатиях на кнопки клавиатуры для других операционных систем.');
+    this.elements.helpText = document.createElement('p');
+    this.elements.helpText.innerText = ('Для переключения между раскладками используйте (windows) => ctrl+alt, (mac os) => '
+      + 'ctrl+option. \n Клавиатура создавалась в MAC OS, могут быть различия в нажатиях на кнопки клавиатуры для других операционных систем.\n'
+      + 'Если у вас что-то не работает, свяжитесь со мной в Discord - Ihor Burenko#8136 или телеграмм - @Burenko');
+    this.elements.help.append(this.elements.helpText);
+
+    this.elements.buttonHide = document.createElement('button');
+    this.elements.buttonHide.classList.add('key', 'button-hide');
+    this.elements.buttonHide.innerText = 'Спрятать информацию';
+    this.elements.help.append(this.elements.buttonHide);
 
     this.elements.wrapper.append(this.elements.inputWindow);
     this.elements.wrapper.append(this.elements.keyboard);
@@ -212,10 +220,14 @@ class VirtualKeyboard {
   toggleVirtualKeys() {
     this.virtualKeyboardLayout = document.querySelector('.keyboard__keys');
     this.virtualKeyboardLayout.addEventListener('mousedown', (event) => {
-      this.keyboardKeyDown({ code: event.target.id, key: event.target.innerText, virtual: true });
+      if (event.target.tagName === 'BUTTON') {
+        this.keyboardKeyDown({ code: event.target.id, key: event.target.innerText, virtual: true });
+      }
     });
     this.virtualKeyboardLayout.addEventListener('mouseup', (event) => {
-      this.keyboardKeyUp({ code: event.target.id, key: event.target.innerText, virtual: true });
+      if (event.target.tagName === 'BUTTON') {
+        this.keyboardKeyUp({ code: event.target.id, key: event.target.innerText, virtual: true });
+      }
     });
   }
 
@@ -228,9 +240,7 @@ class VirtualKeyboard {
         break;
 
       case 'CapsLock':
-        if (!this.props.capsLock) {
-          this.toggleCapsLock();
-        } else if (event.virtual && this.props.capsLock) {
+        if (!this.props.capsLock || (event.virtual && this.props.capsLock)) {
           this.toggleCapsLock();
         }
         break;
@@ -257,13 +267,11 @@ class VirtualKeyboard {
 
       case 'ControlLeft':
         this.props.controlPress = true;
-        this.checkLangChangeFromHardware();
         break;
 
       case 'AltLeft':
       case 'AltRight':
         this.props.altPress = true;
-        this.checkLangChangeFromHardware();
         break;
 
       case 'lang':
@@ -324,14 +332,10 @@ class VirtualKeyboard {
   keyboardKeyUp(event) {
     switch (event.code) {
       case 'CapsLock':
-        // this.shiftkKey = document.querySelector('#ShiftLeft').classList.contains('key_pressed');
-        // if (this.props.capsLock && !this.shiftkKey && event.type === 'keyup') {
-        //   this.toggleCapsLock();
-        // }
         if (this.props.shift) {
           this.props.capsLock = false;
           this.showCapsLockActive();
-        } else {
+        } else if (!event.virtual) {
           this.toggleCapsLock();
         }
         break;
@@ -342,10 +346,12 @@ class VirtualKeyboard {
         break;
 
       case 'ControlLeft':
+        this.checkLangChangeFromHardware();
         this.props.controlPress = false;
         break;
 
       case 'AltLeft':
+        this.checkLangChangeFromHardware();
         this.props.altPress = false;
         break;
 
@@ -377,6 +383,13 @@ class VirtualKeyboard {
       this.unpressedKey.classList.remove('key_pressed');
     }
   }
+
+  hideHelpInfoEvent() {
+    this.hideBtn = document.querySelector('.button-hide');
+    this.hideBtn.addEventListener('click', () => {
+      document.querySelector('.help').style.display = 'none';
+    });
+  }
 }
 
 window.onload = function () {
@@ -384,4 +397,5 @@ window.onload = function () {
   keyboard.init();
   keyboard.toggleHardwareKeys();
   keyboard.toggleVirtualKeys();
+  keyboard.hideHelpInfoEvent();
 };
