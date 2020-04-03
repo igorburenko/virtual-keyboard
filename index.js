@@ -210,10 +210,14 @@ class VirtualKeyboard {
 
   toggleHardwareKeys() {
     document.addEventListener('keydown', (event) => {
-      this.keyboardKeyDown(event);
+      if (this.keyLayout.eventCode.includes(event.code)) {
+        this.keyboardKeyDown(event);
+      }
     });
     document.addEventListener('keyup', (event) => {
-      this.keyboardKeyUp(event);
+      if (this.keyLayout.eventCode.includes(event.code)) {
+        this.keyboardKeyUp(event);
+      }
     });
   }
 
@@ -227,6 +231,16 @@ class VirtualKeyboard {
     this.virtualKeyboardLayout.addEventListener('mouseup', (event) => {
       if (event.target.tagName === 'BUTTON') {
         this.keyboardKeyUp({ code: event.target.id, key: event.target.innerText, virtual: true });
+      }
+    });
+    this.virtualKeyboardLayout.addEventListener('mouseout', (event) => {
+      // const unpressedKey = document.querySelector(`#${event.fromElement.id}`);
+      // console.log(event.fromElement.id);
+      if (event.target.tagName === 'BUTTON') {
+        const unpressedKey = document.querySelector(`#${event.fromElement.id}`);
+        if (unpressedKey.classList.contains('key_pressed')) {
+          unpressedKey.classList.remove('key_pressed');
+        }
       }
     });
   }
@@ -281,39 +295,34 @@ class VirtualKeyboard {
       case 'MetaLeft':
         break;
 
-      case 'MetaRight':
-      case 'ShiftRight':
-      case 'Escape':
-      case 'F1':
-      case 'F2':
-      case 'F3':
-      case 'F4':
-      case 'F5':
-      case 'F6':
-      case 'F7':
-      case 'F8':
-      case 'F9':
-      case 'F10':
-      case 'F11':
-      case 'F12':
-        return;
-
       case 'ArrowRight':
+        if (!event.virtual) {
+          event.preventDefault();
+        }
         this.props.textValue += '→';
         this.printToWindow();
         break;
 
       case 'ArrowLeft':
+        if (!event.virtual) {
+          event.preventDefault();
+        }
         this.props.textValue += '←';
         this.printToWindow();
         break;
 
       case 'ArrowDown':
+        if (!event.virtual) {
+          event.preventDefault();
+        }
         this.props.textValue += '↓';
         this.printToWindow();
         break;
 
       case 'ArrowUp':
+        if (!event.virtual) {
+          event.preventDefault();
+        }
         this.props.textValue += '↑';
         this.printToWindow();
         break;
@@ -357,23 +366,6 @@ class VirtualKeyboard {
 
       case 'MetaLeft':
         break;
-
-      case 'MetaRight':
-      case 'ShiftRight':
-      case 'Escape':
-      case 'F1':
-      case 'F2':
-      case 'F3':
-      case 'F4':
-      case 'F5':
-      case 'F6':
-      case 'F7':
-      case 'F8':
-      case 'F9':
-      case 'F10':
-      case 'F11':
-      case 'F12':
-        return;
 
       default:
         break;
