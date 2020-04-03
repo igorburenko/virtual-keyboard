@@ -234,8 +234,6 @@ class VirtualKeyboard {
       }
     });
     this.virtualKeyboardLayout.addEventListener('mouseout', (event) => {
-      // const unpressedKey = document.querySelector(`#${event.fromElement.id}`);
-      // console.log(event.fromElement.id);
       if (event.target.tagName === 'BUTTON') {
         const unpressedKey = document.querySelector(`#${event.fromElement.id}`);
         if (unpressedKey.classList.contains('key_pressed')) {
