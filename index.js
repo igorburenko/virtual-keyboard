@@ -383,6 +383,7 @@ class VirtualKeyboard {
 }
 
 window.onload = function () {
+  window.localStorage.lang = 'eng';
   const keyboard = new VirtualKeyboard();
   keyboard.init();
   keyboard.toggleHardwareKeys();
